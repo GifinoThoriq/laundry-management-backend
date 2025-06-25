@@ -21,7 +21,49 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        return response()->json(['user' => $user], 201);
 
+        return response()->json([
+            'meta' => [
+                'status' => 200,
+                'message' => 'Register successful',
+            ],
+            'data' => [
+                'user' => $user
+            ],
+        ]);
+
+    }
+
+    public function login(Request $request){
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        //checking email
+        $user = User::where('email', $validated['email'])->first();
+
+        //checking password
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
+            return response()->json([
+                'meta' => [
+                    'status' => 401,
+                    'message' => 'Invalid credentials',
+                ],
+            ], 401);
+        }
+
+        $token = $user->createToken('api_token')->plainTextToken;
+
+        return response()->json([
+            'meta' => [
+                'status' => 200,
+                'message' => 'Login successful',
+            ],
+            'data' => [
+                'user' => $user,
+                'token' => $token,
+            ],
+        ]);
     }
 }

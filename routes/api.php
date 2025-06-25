@@ -5,3 +5,6 @@ use App\Http\Controllers\AuthController;
 
 //Register User
 Route::post('/register', [AuthController::class, 'register']);
+
+//Login User
+Route::post('/login', [AuthController::class, 'login']);
