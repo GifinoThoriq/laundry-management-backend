@@ -11,11 +11,39 @@ class EmpController extends Controller
 {
 
     public function customers(){
+        $users = User::with('roles')
+            ->whereHas('roles', function($query) {
+                $query->where('name', 'customer');
+            })
+            ->get();
 
+        return response()->json([
+            'meta' => [
+                'status' => 200,
+                'message' => 'Fetched successful',
+            ],
+            'data' => [
+                'users' => $users
+            ],
+        ]);
     }
 
     public function employees(){
+        $users = User::with('roles')
+            ->whereDoesntHave('roles', function($query) {
+                $query->where('name', 'customer');
+            })
+            ->get();
 
+        return response()->json([
+            'meta' => [
+                'status' => 200,
+                'message' => 'Fetched successful',
+            ],
+            'data' => [
+                'users' => $users
+            ],
+        ]);
     }
 
     public function roles(){

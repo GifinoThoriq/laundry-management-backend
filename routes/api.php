@@ -15,3 +15,9 @@ Route::middleware(['auth:sanctum', 'role:admin'])->get('/roles', [EmpController:
 
 //register by admin
 Route::middleware(['auth:sanctum', 'role:admin'])->post('/register-admin', [EmpController::class, 'registerAdmin']);
+
+//get all employees
+Route::middleware(['auth:sanctum', 'role:admin'])->get('/employees', [EmpController::class, 'employees']);
+
+//get all customers
+Route::middleware(['auth:sanctum', 'role:admin'])->get('/customers', [EmpController::class, 'customers']);
