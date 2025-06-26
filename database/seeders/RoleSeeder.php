@@ -20,14 +20,16 @@ class RoleSeeder extends Seeder
         $admin = Role::create(['name' => 'admin']);
         $washer = Role::create(['name' => 'washer']);
         $cashier = Role::create(['name' => 'cashier']);
-
+        $customer = Role::create(['name' => 'customer']);
 
         //create permissions
         $permissions = [
             'manage employees',
             'manage customers',
             'manage payments',
-            'manage clothes'
+            'manage clothes',
+            'employee site',
+            'customer site'
         ];
 
         foreach ($permissions as $permission) {
@@ -38,6 +40,7 @@ class RoleSeeder extends Seeder
         $admin->syncPermissions($permissions); // all permissions
         $washer->syncPermissions(['manage clothes']);
         $cashier->syncPermissions(['manage payments']);
+        $customer->syncPermissions(['customer site']);
 
         //assign role to user
         $user = User::find(1);//find by id
