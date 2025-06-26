@@ -10,39 +10,47 @@ use Spatie\Permission\Models\Role;
 class EmpController extends Controller
 {
 
-    public function customers(){
-        $users = User::with('roles')
-            ->whereHas('roles', function($query) {
-                $query->where('name', 'customer');
-            })
-            ->get();
+    public function users(Request $request){
+
+        $query = User::query()->with('roles');
+
+        //search by name, email, role
+        if($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('roles', function ($roleQuery) use ($search) {
+                        $roleQuery->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        //multiple role
+        if ($roleParam = $request->query('roles')) {
+
+            $roles = explode(',', $roleParam);
+
+            $query->whereHas('roles', function ($q) use ($roles) {
+                $q->whereIn('name', $roles);
+            });
+        }
+    
+        // Pagination support
+        $perPage = $request->query('per_page', 10);
+        $users = $query->paginate($perPage)->withQueryString();
 
         return response()->json([
             'meta' => [
                 'status' => 200,
-                'message' => 'Fetched successful',
+                'message' => 'Filtered user list',
+                'pagination' => [
+                    'total' => $users->total(),
+                    'current_page' => $users->currentPage(),
+                    'per_page' => $users->perPage(),
+                    'last_page' => $users->lastPage(),
+                ],
             ],
-            'data' => [
-                'users' => $users
-            ],
-        ]);
-    }
-
-    public function employees(){
-        $users = User::with('roles')
-            ->whereDoesntHave('roles', function($query) {
-                $query->where('name', 'customer');
-            })
-            ->get();
-
-        return response()->json([
-            'meta' => [
-                'status' => 200,
-                'message' => 'Fetched successful',
-            ],
-            'data' => [
-                'users' => $users
-            ],
+            'data' => $users->items(),
         ]);
     }
 
