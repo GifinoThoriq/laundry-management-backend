@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClothesController;
 use App\Http\Controllers\EmpController;
 use App\Http\Controllers\UserController;
 
@@ -22,4 +23,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->get('/users', [UserController
 
 //get edit users
 Route::middleware(['auth:sanctum', 'role:admin'])->post('/edit-user/{user}', [UserController::class, 'editUsers']);
+
+//get all clothes
+Route::middleware(['auth:sanctum'])->get('/all-clothes', [ClothesController::class, 'allClothes']);
+
+//get user clothes
+Route::middleware(['auth:sanctum', 'role:customer'])->get('/clothes', [ClothesController::class, 'customerClothes']);
+
+//add clothes
+Route::middleware(['auth:sanctum', 'role:customer'])->post('/add-clothes', [ClothesController::class, 'addClothes']);
 
